@@ -1,0 +1,12 @@
+[project]
+name = "ICA Data"
+version = "1.0"
+description = "Wrapper for ICA data APIs"
+url = "https://github.com/SequenceBio/ica-data"
+license = "MIT"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages]
+find = {}
