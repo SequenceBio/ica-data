@@ -3,7 +3,6 @@ name = "ica-data"
 version = "0.0.1"
 description = "Wrapper for ICA data APIs"
 url = "https://github.com/SequenceBio/ica-data"
-license = "MIT"
 
 [build-system]
 build-backend = "setuptools.build_meta"
