@@ -77,6 +77,8 @@ class DataApi:
 
     def download(self, file_path):
         """Download a file from the ICA project bucket."""
+        # TODO: add an optional download_path argument to download to a different location (see the upload method above)
+
         self.__authenticate()
 
         try:
