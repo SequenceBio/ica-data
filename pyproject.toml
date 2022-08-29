@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ica-data"
-version = "0.1.2.2"
+version = "0.1.2.3"
 description = ""
 authors = ["mattstenback <mstenback@gmail.com>"]
 
