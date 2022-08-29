@@ -119,7 +119,7 @@ class DataApi:
             results = self.api_client.get_project_data_list(project_id=self.project_id, file_path=[path], filename=[filename], filename_match_mode="EXACT", type="FILE")
             file_id = results.items[0].data.id
             printable_file_id = f"{file_id}"
-            print(f"File found. ID: {file_id}")
+            print(f"File found. ID: {printable_file_id}")
 
             return file_id
         except icav2.ApiException as e:
