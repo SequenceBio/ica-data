@@ -94,7 +94,7 @@ class DataApi:
             download_request = requests.get(download.url)
 
             # Write file to local filesystem.
-            temp_filename = f"/{file_path}"
+            temp_filename = f"/tmp/{file_path}"
             open(temp_filename, 'wb').write(download_request.content)
             print(f"File downloaded to: {temp_filename}")
 
@@ -119,6 +119,7 @@ class DataApi:
             filename = os.path.basename(file_path)
             results = self.api_client.get_project_data_list(project_id=self.project_id, file_path=[path], filename=[filename], filename_match_mode="EXACT", type="FILE")
             file_id = results.items[0].data.id
+            print(f"File ID: {file_id}")
 
             return file_id
         except icav2.ApiException as e:
