@@ -94,7 +94,7 @@ class DataApi:
             download_request = requests.get(download.url)
 
             # Write file to local filesystem.
-            temp_filename = f"/tmp/{file_path}"
+            temp_filename = f"/{file_path}"
             open(temp_filename, 'wb').write(download_request.content)
             print(f"File downloaded to: {temp_filename}")
 
