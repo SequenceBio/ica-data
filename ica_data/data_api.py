@@ -52,7 +52,7 @@ class DataApi:
 
     def upload(self, file_path, upload_path=None):
         """Upload a file to the ICA project bucket."""
-        # TODO: Sort out the issue of overwriting. 
+        # TODO: Sort out the issue of overwriting.
 
         self.__authenticate()
 
@@ -88,7 +88,7 @@ class DataApi:
             results = self.api_client.get_project_data_list(project_id=self.project_id, file_path=[path], filename=[filename], filename_match_mode="EXACT", type="FILE")
             file_id = results.items[0].data.id
 
-            # Download file 
+            # Download file
             download = self.api_client.create_download_url_for_data(project_id=self.project_id, data_id=file_id)
             download_request = requests.get(download.url)
 
@@ -110,7 +110,15 @@ class DataApi:
 
     def find(self, file_path):
         """"Find a single file in an ICA project."""
-        # TODO: Refer to the todo up in the download method, bring that code down here, wrap it in a try catch,  
 
         self.__authenticate()
-        pass
+
+        try:
+            path = os.path.dirname(file_path)
+            filename = os.path.basename(file_path)
+            results = self.api_client.get_project_data_list(project_id=self.project_id, file_path=[path], filename=[filename], filename_match_mode="EXACT", type="FILE")
+            file_id = results.items[0].data.id
+
+            return file_id
+        except icav2.ApiException as e:
+            print(f"Exception when trying to find file: {e}")
