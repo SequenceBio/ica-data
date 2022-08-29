@@ -88,7 +88,6 @@ class DataApi:
             results = self.api_client.get_project_data_list(project_id=self.project_id, file_path=[path], filename=[filename], filename_match_mode="EXACT", type="FILE")
             # file_id = results.items[0].data.id
             file_id = find(file_path)
-            print(f"File ID: {file_id}")
 
             # Download file
             download = self.api_client.create_download_url_for_data(project_id=self.project_id, data_id=file_id)
@@ -120,8 +119,6 @@ class DataApi:
             filename = os.path.basename(file_path)
             results = self.api_client.get_project_data_list(project_id=self.project_id, file_path=[path], filename=[filename], filename_match_mode="EXACT", type="FILE")
             file_id = results.items[0].data.id
-            printable_file_id = f"{file_id}"
-            print(f"File found. ID: {printable_file_id}")
 
             return file_id
         except icav2.ApiException as e:
