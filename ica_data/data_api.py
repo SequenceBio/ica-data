@@ -107,7 +107,13 @@ class DataApi:
         # TODO: if you get a file_id, delete the file. if you get a file_path, find the file first with find, then delete it (likely with the file_id).
 
         self.__authenticate()
-        pass
+
+        try:
+            data_id = self.find(file_path) if file_id == None else file_id
+            result = self.api_client.delete_data(project_id=self.project_id, data_id=data_id)
+            print(f"result: {result}")
+        except icav2.ApiException as e:
+            print(f"Exception when deleting file: {e}")
 
     def find(self, file_path):
         """"Find a single file in an ICA project."""
