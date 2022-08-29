@@ -3,6 +3,7 @@ import requests
 import getpass
 import icav2
 from icav2.api import project_data_api
+from pprint import pprint
 
 class DataApi:
     def __init__(self, project_id=None, tenant=None):
