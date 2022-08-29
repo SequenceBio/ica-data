@@ -36,7 +36,6 @@ class DataApi:
 
     def list(self, page_size=50, page_offset=0, sort="path"):
         """List all data objects in the ICA project directory."""
-        # TODO: Change this to return a list of data objects rather than just print stuff out (maybe have an argument to print? or a separate method to print?)
         # TODO: Add args (ideally a single pass-through arg) for the various filtering options so folks can filter by path, etc.
 
         self.__authenticate()
@@ -44,7 +43,7 @@ class DataApi:
         try:
             project_data_page = self.api_client.get_project_data_list(project_id=self.project_id, page_size=str(page_size), page_offset=str(page_offset), sort=sort)
             while len(project_data_page.items) > 0:
-                pprint(project_data_page)
+                pprint(project_data_page.items)
                 page_offset = page_offset + page_size
                 project_data_page = self.api_client.get_project_data_list(project_id=self.project_id, page_size=str(page_size), page_offset=str(page_offset), sort=sort)
         except icav2.ApiException as e:
@@ -123,3 +122,19 @@ class DataApi:
             return file_id
         except icav2.ApiException as e:
             print(f"Exception when trying to find file: {e}")
+
+    def print(self, page_size=50, page_offset=0, sort="path"):
+        """Print a list of all data objects in the ICA project directory."""
+        # TODO: Add args (ideally a single pass-through arg) for the various filtering options so folks can filter by path, etc.
+
+        self.__authenticate()
+
+        try:
+            project_data_page = self.api_client.get_project_data_list(project_id=self.project_id, page_size=str(page_size), page_offset=str(page_offset), sort=sort)
+            while len(project_data_page.items) > 0:
+                for file in project_data_page.items:
+                    print(f"Path: {file.data.details.path} | Type: {file.data.details.data_type}")
+                page_offset = page_offset + page_size
+                project_data_page = self.api_client.get_project_data_list(project_id=self.project_id, page_size=str(page_size), page_offset=str(page_offset), sort=sort)
+        except icav2.ApiException as e:
+            print(f"Exception when listing project data: {e}")
