@@ -118,7 +118,8 @@ class DataApi:
             filename = os.path.basename(file_path)
             results = self.api_client.get_project_data_list(project_id=self.project_id, file_path=[path], filename=[filename], filename_match_mode="EXACT", type="FILE")
             file_id = results.items[0].data.id
-
+            print(f"File found. ID: {file_id}")
+            
             return file_id
         except icav2.ApiException as e:
             print(f"Exception when trying to find file: {e}")
