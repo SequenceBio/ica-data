@@ -43,8 +43,7 @@ class DataApi:
         try:
             project_data_page = self.api_client.get_project_data_list(project_id=self.project_id, page_size=str(page_size), page_offset=str(page_offset), sort=sort)
             while len(project_data_page.items) > 0:
-                for file in project_data_page.items:
-                    print(f"Path: {file.data.details.path} | Type: {file.data.details.data_type}")
+                pprint(project_data_page)
                 page_offset = page_offset + page_size
                 project_data_page = self.api_client.get_project_data_list(project_id=self.project_id, page_size=str(page_size), page_offset=str(page_offset), sort=sort)
         except icav2.ApiException as e:
@@ -75,18 +74,12 @@ class DataApi:
             print(f"Exception when uploading file: {e}")
 
 
-    def download(self, file_path):
+    def download(self, file_path, download_path=None):
         """Download a file from the ICA project bucket."""
-        # TODO: add an optional download_path argument to download to a different location (see the upload method above)
 
         self.__authenticate()
 
         try:
-            # TODO: This first bit here could be extracted to a 'find' function.
-            path = os.path.dirname(file_path)
-            filename = os.path.basename(file_path)
-            results = self.api_client.get_project_data_list(project_id=self.project_id, file_path=[path], filename=[filename], filename_match_mode="EXACT", type="FILE")
-            # file_id = results.items[0].data.id
             file_id = self.find(file_path)
 
             # Download file
@@ -94,7 +87,7 @@ class DataApi:
             download_request = requests.get(download.url)
 
             # Write file to local filesystem.
-            temp_filename = f"/tmp/{file_path}"
+            temp_filename = f"/tmp/{file_path}" if download_path == None else f"{download_path}/{file_path}"
             open(temp_filename, 'wb').write(download_request.content)
             print(f"File downloaded to: {temp_filename}")
 
@@ -104,7 +97,6 @@ class DataApi:
 
     def delete(self, file_id = None, file_path = None):
         """"Delete a single file."""
-        # TODO: if you get a file_id, delete the file. if you get a file_path, find the file first with find, then delete it (likely with the file_id).
 
         self.__authenticate()
 
