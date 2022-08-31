@@ -3,7 +3,6 @@ import requests
 import getpass
 import icav2
 from icav2.api import project_data_api
-from pprint import pprint
 
 class DataApi:
     def __init__(self, project_id=None, tenant=None):
@@ -34,29 +33,8 @@ class DataApi:
             print(f"Error authenticating to {os.environ['ICA_URL']}")
             print(f"Response: {auth_request.status_code}")
 
-    def list(self, page_size=50, page_offset=0, sort="path", **kwargs):
-        """List all data objects in the ICA project directory."""
-        # TODO: Merge all the query args into a single dict.
-
-        self.__authenticate()
-
-        results = []
-
-        try:
-            project_data_page = self.api_client.get_project_data_list(project_id=self.project_id, page_size=str(page_size), page_offset=str(page_offset), sort=sort, **kwargs)
-            while len(project_data_page.items) > 0:
-                results.extend(project_data_page.items)
-                page_offset = page_offset + page_size
-                project_data_page = self.api_client.get_project_data_list(project_id=self.project_id, page_size=str(page_size), page_offset=str(page_offset), sort=sort, **kwargs)
-        except icav2.ApiException as e:
-            print(f"Exception when listing project data: {e}")
-
-        print(f"Found {len(results)} files.")
-        return results
-
     def upload(self, file_path, upload_path=None):
         """Upload a file to the ICA project bucket."""
-        # TODO: Sort out the issue of overwriting.
 
         self.__authenticate()
 
@@ -69,7 +47,11 @@ class DataApi:
             data_object = self.api_client.create_data_in_project(self.project_id, create_data=empty_object)
             file_id = data_object.data.id
         except icav2.ApiException as e:
-            print(f"Exception when creating the data object: {e}")
+            if e.status == 409:
+                print(f"Error. A file named {upload_path} already exists in the project.")
+            else:
+                print(f"Exception when trying to create file: {e}") 
+            return
 
         try:
             upload = self.api_client.create_upload_url_for_data(project_id=self.project_id, data_id=file_id)
@@ -100,18 +82,6 @@ class DataApi:
         except icav2.ApiException as e:
             print(f"Exception when downloading file: {e}")
 
-    def delete(self, file_id = None, file_path = None):
-        """"Delete a single file."""
-
-        self.__authenticate()
-
-        try:
-            data_id = self.find(file_path) if file_id == None else file_id
-            result = self.api_client.delete_data(project_id=self.project_id, data_id=data_id)
-            print(f"result: {result}")
-        except icav2.ApiException as e:
-            print(f"Exception when deleting file: {e}")
-
     def find(self, file_path):
         """"Find a single file in an ICA project."""
 
@@ -127,3 +97,35 @@ class DataApi:
             return file_id
         except icav2.ApiException as e:
             print(f"Exception when trying to find file: {e}")
+
+    def list(self, page_size=50, page_offset=0, sort="path", **kwargs):
+        """List all data objects in the ICA project directory."""
+        # TODO: Merge all the query args into a single dict.
+
+        self.__authenticate()
+
+        results = []
+
+        try:
+            project_data_page = self.api_client.get_project_data_list(project_id=self.project_id, page_size=str(page_size), page_offset=str(page_offset), sort=sort, **kwargs)
+            while len(project_data_page.items) > 0:
+                results.extend(project_data_page.items)
+                page_offset = page_offset + page_size
+                project_data_page = self.api_client.get_project_data_list(project_id=self.project_id, page_size=str(page_size), page_offset=str(page_offset), sort=sort, **kwargs)
+        except icav2.ApiException as e:
+            print(f"Exception when listing project data: {e}")
+
+        print(f"Found {len(results)} files.")
+        return results
+
+    def delete(self, file_id = None, file_path = None):
+        """"Delete a single file."""
+
+        self.__authenticate()
+
+        try:
+            data_id = self.find(file_path) if file_id == None else file_id
+            result = self.api_client.delete_data(project_id=self.project_id, data_id=data_id)
+            print(f"result: {result}")
+        except icav2.ApiException as e:
+            print(f"Exception when deleting file: {e}")
