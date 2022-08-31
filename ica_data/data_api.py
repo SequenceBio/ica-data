@@ -34,20 +34,25 @@ class DataApi:
             print(f"Error authenticating to {os.environ['ICA_URL']}")
             print(f"Response: {auth_request.status_code}")
 
-    def list(self, page_size=50, page_offset=0, sort="path"):
+    def list(self, page_size=50, page_offset=0, sort="path", **kwargs):
         """List all data objects in the ICA project directory."""
-        # TODO: Add args (ideally a single pass-through arg) for the various filtering options so folks can filter by path, etc.
+        # TODO: Merge all the query args into a single dict.
 
         self.__authenticate()
 
+        results = []
+
         try:
-            project_data_page = self.api_client.get_project_data_list(project_id=self.project_id, page_size=str(page_size), page_offset=str(page_offset), sort=sort)
+            project_data_page = self.api_client.get_project_data_list(project_id=self.project_id, page_size=str(page_size), page_offset=str(page_offset), sort=sort, **kwargs)
             while len(project_data_page.items) > 0:
-                pprint(project_data_page.items)
+                results.extend(project_data_page.items)
                 page_offset = page_offset + page_size
-                project_data_page = self.api_client.get_project_data_list(project_id=self.project_id, page_size=str(page_size), page_offset=str(page_offset), sort=sort)
+                project_data_page = self.api_client.get_project_data_list(project_id=self.project_id, page_size=str(page_size), page_offset=str(page_offset), sort=sort, **kwargs)
         except icav2.ApiException as e:
             print(f"Exception when listing project data: {e}")
+
+        print(f"Found {len(results)} files.")
+        return results
 
     def upload(self, file_path, upload_path=None):
         """Upload a file to the ICA project bucket."""
@@ -122,19 +127,3 @@ class DataApi:
             return file_id
         except icav2.ApiException as e:
             print(f"Exception when trying to find file: {e}")
-
-    def print(self, page_size=50, page_offset=0, sort="path"):
-        """Print a list of all data objects in the ICA project directory."""
-        # TODO: Add args (ideally a single pass-through arg) for the various filtering options so folks can filter by path, etc.
-
-        self.__authenticate()
-
-        try:
-            project_data_page = self.api_client.get_project_data_list(project_id=self.project_id, page_size=str(page_size), page_offset=str(page_offset), sort=sort)
-            while len(project_data_page.items) > 0:
-                for file in project_data_page.items:
-                    print(f"Path: {file.data.details.path} | Type: {file.data.details.data_type}")
-                page_offset = page_offset + page_size
-                project_data_page = self.api_client.get_project_data_list(project_id=self.project_id, page_size=str(page_size), page_offset=str(page_offset), sort=sort)
-        except icav2.ApiException as e:
-            print(f"Exception when listing project data: {e}")
