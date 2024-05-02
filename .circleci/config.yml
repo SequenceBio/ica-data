@@ -1,0 +1,32 @@
+version: 2.1
+orbs:
+  blackduck: sequencebio/blackduck@1.0.3
+jobs:
+  blackduck_scan:
+    executor: blackduck/default
+    steps:
+      - checkout
+      - run:
+          name: Install Poetry
+          command: |
+            sudo apt update
+            sudo apt install pipx
+            pipx ensurepath
+            pipx install poetry
+      - run:
+          name: Install Project using Poetry
+          command: |
+            poetry install
+      - blackduck/scan
+
+workflows:
+  version: 2
+  blackduck_scan:
+    jobs:
+      - blackduck_scan:
+          context: blackduck_scan
+          filters:
+            branches:
+              only: /.*/
+            tags:
+              only: /.*/
